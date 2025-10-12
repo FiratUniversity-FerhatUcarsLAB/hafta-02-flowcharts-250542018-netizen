@@ -1,0 +1,42 @@
+digraph G {
+start[shape=oval,label="Kart tak"]
+tak[shape=paralelogram,label="Şifre Gir"];
+sifreKontrol[shape=diamond,label="GirilenSifre==DogruSifre"]
+denemeSayısı[shape=diamond,label="hatalıGiriş==3"]
+HatalıGiris[shape=box,label="hatalıGiris++"]
+
+
+
+sifreKontrol->HatalıGiris[label="şifre Yanlış"]
+start->tak->sifreKontrol
+HatalıGiris->denemeSayısı
+denemeSayısı->sifreKontrol[label="3 Olmadı"]
+denemeSayısı->end
+
+bakiye[shape=paralelogram,label="Bakiye Durumu"]
+tutar[shape=box,label="çekilmek istenen tutar:"]
+bakiyeKontrol[shape=diamond, label="Bakiye>=GirilenMiktar"]
+yetersizBakiye[shape=box,label="Bakiye Yetersiz Lütfen Tekrar Girin. "]
+kat[shape=diamond,label="tutar%20"]
+gunlukLimit[shape=diamond,label="Günlük limit<10000"]
+ver[shape=parelelogram, label="Paranızı alabilirsiniz."]
+
+sifreKontrol->bakiye[label="Doğru"]
+bakiye->tutar
+tutar->bakiyeKontrol
+bakiyeKontrol->yetersizBakiye->tutar
+bakiyeKontrol->kat
+kat->tutar[label="Hatalı Giriş Lütfen 20 Katı girin."]
+
+gunlukLimit->tutar[label="Günlük Limit Aşımı."]
+
+kat->gunlukLimit[label="kalan 0"]
+gunlukLimit->ver[label="Doğru"]
+
+
+Başkaİşlem[shape=diamond,label="Başka İşlem Yapmak İstermisiniz?"]
+
+ver->Başkaİşlem
+Başkaİşlem->tutar[label="Evet"]
+Başkaİşlem->KartVer[label="Hayır"]
+}
