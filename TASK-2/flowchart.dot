@@ -1,0 +1,83 @@
+digraph ECommerceFlow {
+    rankdir=TB;
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    edge [fontname="Helvetica"];
+
+    // Başlangıç ve Bitiş Düğümleri
+    start [label="Sistemi Başlat", shape=oval, style=filled, fillcolor=lightblue];
+    end_complete [label="Sipariş Tamamlandı", shape=oval, style=filled, fillcolor=lightgreen];
+    end_fail [label="İşlem Sonlandı", shape=oval, style=filled, fillcolor=lightcoral];
+
+    // Düğüm Tanımları
+    // Adım 1: Kullanıcı Girişi
+    input_user [label="Kullanıcı Adı ve Şifre Girilir", shape=parallelogram];
+    check_user [label="Kullanıcı Bilgileri Doğru mu?", shape=diamond, style=filled, fillcolor=yellow];
+
+    // Adım 2 & 3: Ürün Ekleme ve Stok Kontrolü
+    select_product [label="Kullanıcı Ürün ve Adet Seçer", shape=parallelogram];
+    check_stock [label="Stok Yeterli mi?", shape=diamond, style=filled, fillcolor=yellow];
+    add_to_cart [label="Ürün Sepete Eklenir / Güncellenir"];
+    stock_fail_msg [label="'Yetersiz Stok' Uyarısı Gösterilir"];
+    continue_shopping [label="Alışverişe Devam Et veya\nÖdemeye Geç"];
+
+    // Adım 4: İndirim Kodu
+    ask_for_code [label="İndirim Kodu Var mı?", shape=diamond, style=filled, fillcolor=yellow];
+    input_code [label="İndirim Kodu Girilir", shape=parallelogram];
+    check_code [label="Kod Geçerli ve\nKoşullar Uygun mu?", shape=diamond, style=filled, fillcolor=yellow];
+    apply_discount [label="İndirim Uygulanır ve\nToplam Güncellenir"];
+    invalid_code_msg [label="'Geçersiz Kod' Uyarısı Gösterilir"];
+
+    // Adım 5: Kargo Hesaplama
+    calculate_shipping [label="Adres ve Sepete Göre\nKargo Hesaplanır"];
+    check_free_shipping [label="Sepet Tutarı Ücretsiz\nKargo Limitinde mi?", shape=diamond, style=filled, fillcolor=yellow];
+    set_shipping_free [label="Kargo Ücreti Sıfırlanır"];
+    add_shipping_fee [label="Kargo Ücreti Toplama Eklenir"];
+    show_final_total [label="Genel Toplam Gösterilir"];
+
+    // Adım 6: Ödeme
+    input_payment [label="Ödeme Bilgileri Girilir", shape=parallelogram];
+    gateway_check [label="Ödeme Ağ Geçidinden\nOnay Geldi mi?", shape=diamond, style=filled, fillcolor=yellow];
+    payment_success [label="Ödeme Başarılı:\nStok Düşülür\nSipariş Kaydedilir\nE-posta Gönderilir"];
+    payment_fail_msg [label="'Ödeme Başarısız' Uyarısı Gösterilir"];
+
+
+    // Akış Çizgileri
+    start -> input_user;
+    input_user -> check_user;
+    check_user -> select_product [label="EVET"];
+    check_user -> end_fail [label="HAYIR"];
+
+    select_product -> check_stock;
+    check_stock -> add_to_cart [label="EVET"];
+    check_stock -> stock_fail_msg [label="HAYIR"];
+    stock_fail_msg -> continue_shopping;
+    add_to_cart -> continue_shopping;
+    
+    continue_shopping -> select_product [label="Devam Et"];
+    continue_shopping -> ask_for_code [label="Ödemeye Geç"];
+
+    ask_for_code -> input_code [label="EVET"];
+    ask_for_code -> check_free_shipping [label="HAYIR"];
+    
+    input_code -> check_code;
+    check_code -> apply_discount [label="EVET"];
+    check_code -> invalid_code_msg [label="HAYIR"];
+    invalid_code_msg -> check_free_shipping;
+    apply_discount -> check_free_shipping;
+
+    check_free_shipping -> set_shipping_free [label="EVET"];
+    check_free_shipping -> calculate_shipping [label="HAYIR"];
+    
+    calculate_shipping -> add_shipping_fee;
+    set_shipping_free -> show_final_total;
+    add_shipping_fee -> show_final_total;
+    
+    show_final_total -> input_payment;
+    input_payment -> gateway_check;
+
+    gateway_check -> payment_success [label="EVET"];
+    gateway_check -> payment_fail_msg [label="HAYIR"];
+    payment_fail_msg -> input_payment [label="Tekrar Dene"];
+    
+    payment_success -> end_complete;
+}
