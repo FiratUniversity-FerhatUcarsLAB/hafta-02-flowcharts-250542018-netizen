@@ -1,0 +1,389 @@
+//ben 
+E-ticaret sitesinde sepet yonetimi ve odeme sistemini adım adım acıkla.
+Kullanıcı girisi, urun ekleme, stok kontrolu, indirim kodu, kargo hesaplama
+ve odeme asamalarını icermeli.
+Bu sistemi pseudocode olarak yaz. Donguler icin DONG  U, ko¸sullar icin EGER
+ISE kullan. Her adımı BAS¸LA ile baslat, BITIR ile bitir. Tum
+kontrol noktalarını belirt. ve bunları 1.sınıf üniversite öğrencisinin anlayacağı şekilde yap tane tane açıkla.
+
+//llm-Cevabı
+Harika bir fikir! E-ticaret sepet yönetimi ve ödeme sisteminin temel mantığını, istenen formatta pseudocode (sözde kod) olarak aşağıda adım adım bulabilirsiniz. Bu kod, belirli bir programlama diline bağlı kalmadan sürecin algoritmasını ve kontrol noktalarını açıklar.
+
+E-Ticaret Sepet ve Ödeme Sistemi Pseudocode
+// ======================================================
+// ADIM 1: KULLANICI GİRİŞİ VE OTURUM YÖNETİMİ
+// ======================================================
+BASLA KULLANICI_GIRISI
+
+  TANIMLA kullaniciAdi, sifre
+  TANIMLA oturumAktifMi = YANLIS
+
+  YAZ "Kullanıcı Adını Giriniz:"
+  OKU kullaniciAdi
+
+  YAZ "Şifreyi Giriniz:"
+  OKU sifre
+
+  // --- Kontrol Noktası: Veritabanı Kullanıcı Doğrulama ---
+  KULLANICI = VeritabanindaKullaniciyiBul(kullaniciAdi)
+
+  EGER KULLANICI VARSA ISE
+    EGER KULLANICI.sifre == sifre ISE
+      oturumAktifMi = DOGRU
+      OturumBaslat(KULLANICI.id)
+      YAZ "Giriş Başarılı. Hoş Geldiniz, " + KULLANICI.isim
+    DEGILSE
+      YAZ "Hatalı şifre."
+    SON_EGER
+  DEGILSE
+    YAZ "Kullanıcı bulunamadı."
+  SON_EGER
+
+BITIR KULLANICI_GIRISI
+
+
+// ======================================================
+// ADIM 2: ÜRÜN EKLEME
+// ======================================================
+BASLA URUN_EKLEME
+
+  TANIMLA secilenUrunID, adet
+  TANIMLA kullaniciSepeti = MevcutSepetiGetir()
+
+  YAZ "Eklemek istediğiniz ürünün ID'sini girin:"
+  OKU secilenUrunID
+
+  YAZ "Adet girin:"
+  OKU adet
+
+  // --- Kontrol Noktası: Stok Kontrolü ---
+  STOK_KONTROLU_YAP(secilenUrunID, adet) // Bu fonksiyon aşağıda tanımlanmıştır
+
+  EGER StokYeterliMi == DOGRU ISE
+    // --- Kontrol Noktası: Ürün Sepette Var mı? ---
+    urunSepetteVarMi = HAYIR
+    DONGU kullaniciSepeti icindeki her urun ICIN
+      EGER urun.id == secilenUrunID ISE
+        urun.adet = urun.adet + adet
+        urunSepetteVarMi = EVET
+        DUR // Döngüyü sonlandır
+      SON_EGER
+    SON_DONGU
+
+    EGER urunSepetteVarMi == HAYIR ISE
+      YENI_URUN = VeritabanindanUrunGetir(secilenUrunID)
+      YENI_URUN.adet = adet
+      kullaniciSepeti.Ekle(YENI_URUN)
+    SON_EGER
+
+    YAZ secilenUrunID + " kodlu ürün sepete eklendi."
+    SepetToplaminiGuncelle()
+  DEGILSE
+    YAZ "Üzgünüz, bu ürün için yeterli stok bulunmamaktadır."
+  SON_EGER
+
+BITIR URUN_EKLEME
+
+
+// ======================================================
+// ADIM 3: STOK KONTROLÜ FONKSİYONU
+// ======================================================
+BASLA STOK_KONTROLU_YAP(urunID, istenenAdet)
+
+  TANIMLA StokYeterliMi = YANLIS
+  URUN_STOK = VeritabanindanStokGetir(urunID)
+
+  // --- Kontrol Noktası: Stok Yeterliliği ---
+  EGER URUN_STOK >= istenenAdet ISE
+    StokYeterliMi = DOGRU
+  DEGILSE
+    StokYeterliMi = YANLIS
+  SON_EGER
+
+BITIR STOK_KONTROLU_YAP
+
+
+// ======================================================
+// ADIM 4: İNDİRİM KODU UYGULAMA
+// ======================================================
+BASLA INDIRIM_KODU_UYGULA
+
+  TANIMLA girilenKod, sepetToplami
+  sepetToplami = MevcutSepetToplaminiGetir()
+
+  YAZ "İndirim kodunuz var mı? Varsa giriniz:"
+  OKU girilenKod
+
+  // --- Kontrol Noktası: Kodun Veritabanında Kontrolü ---
+  INDIRIM_KUPONU = VeritabanindaKuponuBul(girilenKod)
+
+  EGER INDIRIM_KUPONU VARSA VE INDIRIM_KUPONU.aktifMi == DOGRU ISE
+    // --- Kontrol Noktası: Kupon Koşulları ---
+    EGER sepetToplami >= INDIRIM_KUPONU.minimumTutar ISE
+      indirimMiktari = (sepetToplami * INDIRIM_KUPONU.indirimOrani) / 100
+      yeniToplam = sepetToplami - indirimMiktari
+      YAZ "İndirim uygulandı. Yeni Toplam: " + yeniToplam
+    DEGILSE
+      YAZ "Bu kuponu kullanmak için sepet tutarınız yeterli değil."
+    SON_EGER
+  DEGILSE
+    YAZ "Geçersiz veya süresi dolmuş indirim kodu."
+  SON_EGER
+
+BITIR INDIRIM_KODU_UYGULA
+
+
+// ======================================================
+// ADIM 5: KARGO HESAPLAMA
+// ======================================================
+BASLA KARGO_HESAPLAMA
+
+  TANIMLA teslimatAdresi, sepetAgirligi
+  TANIMLA kargoUcreti = 0
+
+  YAZ "Teslimat adresinin şehrini giriniz:"
+  OKU teslimatAdresi.sehir
+
+  sepetAgirligi = SepettekiUrunlerinAgirliginiHesapla()
+
+  // --- Kontrol Noktası: Adrese ve Ağırlığa Göre Kargo Ücreti ---
+  EGER teslimatAdresi.sehir == "İstanbul" ISE
+    kargoUcreti = 20
+  DEGILSE
+    kargoUcreti = 30
+  SON_EGER
+
+  EGER sepetAgirligi > 5 ISE
+    kargoUcreti = kargoUcreti + 10 // Ek ağırlık ücreti
+  SON_EGER
+  
+  // --- Kontrol Noktası: Ücretsiz Kargo Kampanyası ---
+  sepetToplami = MevcutSepetToplaminiGetir()
+  EGER sepetToplami > 500 ISE
+    kargoUcreti = 0
+    YAZ "500 TL üzeri alışverişlerde kargo ücretsiz!"
+  SON_EGER
+  
+  YAZ "Hesaplanan Kargo Ücreti: " + kargoUcreti
+  GENEL_TOPLAM = sepetToplami + kargoUcreti
+  YAZ "Ödenecek Tutar: " + GENEL_TOPLAM
+
+BITIR KARGO_HESAPLAMA
+
+
+// ======================================================
+// ADIM 6: ÖDEME AŞAMASI
+// ======================================================
+BASLA ODEME_YAP
+
+  TANIMLA kartNumarasi, sonKullanmaTarihi, CVC
+  TANIMLA odemeBasariliMi = YANLIS
+
+  YAZ "Kredi Kartı Numarasını Giriniz:"
+  OKU kartNumarasi
+
+  YAZ "Son Kullanma Tarihini Giriniz (AA/YY):"
+  OKU sonKullanmaTarihi
+
+  YAZ "CVC Kodunu Giriniz:"
+  OKU CVC
+
+  // --- Kontrol Noktası: Kart Bilgilerinin Format Kontrolü ---
+  EGER KartBilgileriGecerliMi(kartNumarasi, sonKullanmaTarihi, CVC) ISE
+
+    // --- Kontrol Noktası: Ödeme Ağ Geçidi (Payment Gateway) İletişimi ---
+    odemeOnayi = OdemeAgGecidineGonder(kartNumarasi, odenecekTutar)
+
+    EGER odemeOnayi == "BASARILI" ISE
+      odemeBasariliMi = DOGRU
+      YAZ "Ödeme başarıyla tamamlandı. Siparişiniz oluşturuldu."
+
+      // --- Kontrol Noktası: Stok Güncelleme ve Sipariş Kaydı ---
+      DONGU sepetimdeki her urun ICIN
+        VeritabanindaStokGuncelle(urun.id, urun.adet)
+      SON_DONGU
+      SiparisiVeritabaninaKaydet()
+      KullaniciyaOnayEpostasiGonder()
+      SepetiTemizle()
+    DEGILSE
+      YAZ "Ödeme reddedildi. Bankanızla iletişime geçin veya bilgileri kontrol edin."
+    SON_EGER
+
+  DEGILSE
+    YAZ "Geçersiz kart bilgileri girdiniz."
+  SON_EGER
+
+BITIR ODEME_YAP
+
+//Ben
+
+Pseudocode’u Graphviz DOT formatına cevir. rankdir=TB kullan. Karar
+noktalarında EVET/HAYIR etiketlerini unutma. ayrıca bir tane daha yap ama bunu ranktir=LR yap
+
+//llm-cevabı
+
+Elbette, hazırlanan pseudocode'un Graphviz DOT formatına çevrilmiş iki farklı versiyonunu aşağıda bulabilirsiniz.
+
+1. Versiyon: rankdir=TB (Yukarıdan Aşağıya Akış)
+Bu versiyonda akış şeması standart bir şekilde yukarıdan aşağıya doğru ilerler.
+
+Kod snippet'i
+
+digraph ECommerceFlow_TB {
+    // Grafik Ayarları
+    graph [rankdir=TB, splines=ortho, nodesep=0.8];
+    node [shape=box, style="rounded,filled", fillcolor="#EFEFEF", fontname="Helvetica"];
+    edge [fontname="Helvetica"];
+
+    // Node Tanımlamaları
+    start [label="Başla", shape=ellipse, style=filled, fillcolor="#B0E0E6"];
+    login_start [label="Kullanıcı Girişi"];
+    user_pass_input [label="Kullanıcı Adı ve Şifre Gir"];
+    user_check [label="Kullanıcı Doğru mu?", shape=diamond, style=filled, fillcolor="#FFDAB9"];
+    login_success [label="Oturum Başlat", shape=box, style=filled, fillcolor="#D4EDDA"];
+    login_fail [label="Hata: Geçersiz Bilgi", shape=box, style=filled, fillcolor="#F8D7DA"];
+    
+    add_product_start [label="Ürün Seç ve Adet Gir"];
+    stock_check [label="Stok Yeterli mi?", shape=diamond, style=filled, fillcolor="#FFDAB9"];
+    stock_fail [label="Hata: Yetersiz Stok", shape=box, style=filled, fillcolor="#F8D7DA"];
+    
+    is_in_cart [label="Ürün Sepette Var mı?", shape=diamond, style=filled, fillcolor="#FFDAB9"];
+    update_quantity [label="Adedi Güncelle"];
+    add_new_item [label="Yeni Ürün Olarak Ekle"];
+    
+    apply_discount [label="İndirim Kodu Gir"];
+    validate_code [label="Kod Geçerli mi?", shape=diamond, style=filled, fillcolor="#FFDAB9"];
+    discount_fail [label="Hata: Geçersiz Kod", shape=box, style=filled, fillcolor="#F8D7DA"];
+    apply_discount_success [label="İndirimi Uygula"];
+    
+    calculate_shipping [label="Teslimat Adresi Gir"];
+    shipping_fee_calc [label="Kargo Ücretini Hesapla"];
+    
+    payment_start [label="Ödeme Bilgilerini Gir"];
+    payment_gateway [label="Ödeme Ağ Geçidine Gönder"];
+    payment_check [label="Ödeme Başarılı mı?", shape=diamond, style=filled, fillcolor="#FFDAB9"];
+    payment_fail [label="Hata: Ödeme Reddedildi", shape=box, style=filled, fillcolor="#F8D7DA"];
+    
+    order_success [label="Sipariş Başarılı", shape=box, style=filled, fillcolor="#D4EDDA"];
+    update_stock [label="Stok Düş"];
+    save_order [label="Siparişi Kaydet"];
+    send_email [label="Onay E-postası Gönder"];
+    end_flow [label="Bitir", shape=ellipse, style=filled, fillcolor="#B0E0E6"];
+
+    // Akış Bağlantıları
+    start -> login_start;
+    login_start -> user_pass_input -> user_check;
+    user_check -> login_success [label=" EVET "];
+    user_check -> login_fail [label=" HAYIR "];
+    
+    login_success -> add_product_start;
+    login_fail -> user_pass_input;
+    
+    add_product_start -> stock_check;
+    stock_check -> is_in_cart [label=" EVET "];
+    stock_check -> stock_fail [label=" HAYIR "];
+    stock_fail -> add_product_start;
+    
+    is_in_cart -> update_quantity [label=" EVET "];
+    is_in_cart -> add_new_item [label=" HAYIR "];
+    update_quantity -> apply_discount;
+    add_new_item -> apply_discount;
+    
+    apply_discount -> validate_code;
+    validate_code -> apply_discount_success [label=" EVET "];
+    validate_code -> discount_fail [label=" HAYIR "];
+    discount_fail -> calculate_shipping;
+    apply_discount_success -> calculate_shipping;
+    
+    calculate_shipping -> shipping_fee_calc;
+    shipping_fee_calc -> payment_start;
+    
+    payment_start -> payment_gateway -> payment_check;
+    payment_check -> order_success [label=" EVET "];
+    payment_check -> payment_fail [label=" HAYIR "];
+    payment_fail -> payment_start;
+    
+    order_success -> update_stock -> save_order -> send_email -> end_flow;
+}
+2. Versiyon: rankdir=LR (Soldan Sağa Akış)
+Kullanıcının istediği rankdir=RB (sağdan sola) standart bir DOT parametresi değildir. Genellikle soldan sağa akış için rankdir=LR kullanılır. Bu nedenle, akışı soldan sağa doğru olacak şekilde hazırladım. Bu, sürecin adımlarını yatay bir düzlemde gösterir.
+
+Kod snippet'i
+
+digraph ECommerceFlow_LR {
+    // Grafik Ayarları
+    graph [rankdir=LR, splines=ortho, nodesep=0.6];
+    node [shape=box, style="rounded,filled", fillcolor="#EFEFEF", fontname="Helvetica"];
+    edge [fontname="Helvetica"];
+
+    // Node Tanımlamaları
+    start [label="Başla", shape=ellipse, style=filled, fillcolor="#B0E0E6"];
+    login_start [label="Kullanıcı Girişi"];
+    user_pass_input [label="Kullanıcı Adı ve Şifre Gir"];
+    user_check [label="Kullanıcı Doğru mu?", shape=diamond, style=filled, fillcolor="#FFDAB9"];
+    login_success [label="Oturum Başlat", shape=box, style=filled, fillcolor="#D4EDDA"];
+    login_fail [label="Hata: Geçersiz Bilgi", shape=box, style=filled, fillcolor="#F8D7DA"];
+    
+    add_product_start [label="Ürün Seç ve Adet Gir"];
+    stock_check [label="Stok Yeterli mi?", shape=diamond, style=filled, fillcolor="#FFDAB9"];
+    stock_fail [label="Hata: Yetersiz Stok", shape=box, style=filled, fillcolor="#F8D7DA"];
+    
+    is_in_cart [label="Ürün Sepette Var mı?", shape=diamond, style=filled, fillcolor="#FFDAB9"];
+    update_quantity [label="Adedi Güncelle"];
+    add_new_item [label="Yeni Ürün Olarak Ekle"];
+    
+    apply_discount [label="İndirim Kodu Gir"];
+    validate_code [label="Kod Geçerli mi?", shape=diamond, style=filled, fillcolor="#FFDAB9"];
+    discount_fail [label="Hata: Geçersiz Kod", shape=box, style=filled, fillcolor="#F8D7DA"];
+    apply_discount_success [label="İndirimi Uygula"];
+    
+    calculate_shipping [label="Teslimat Adresi Gir"];
+    shipping_fee_calc [label="Kargo Ücretini Hesapla"];
+    
+    payment_start [label="Ödeme Bilgilerini Gir"];
+    payment_gateway [label="Ödeme Ağ Geçidine Gönder"];
+    payment_check [label="Ödeme Başarılı mı?", shape=diamond, style=filled, fillcolor="#FFDAB9"];
+    payment_fail [label="Hata: Ödeme Reddedildi", shape=box, style=filled, fillcolor="#F8D7DA"];
+    
+    order_success [label="Sipariş Başarılı", shape=box, style=filled, fillcolor="#D4EDDA"];
+    update_stock [label="Stok Düş"];
+    save_order [label="Siparişi Kaydet"];
+    send_email [label="Onay E-postası Gönder"];
+    end_flow [label="Bitir", shape=ellipse, style=filled, fillcolor="#B0E0E6"];
+
+    // Akış Bağlantıları
+    start -> login_start;
+    login_start -> user_pass_input -> user_check;
+    user_check -> login_success [label=" EVET "];
+    user_check -> login_fail [label=" HAYIR "];
+    
+    login_success -> add_product_start;
+    login_fail -> user_pass_input;
+    
+    add_product_start -> stock_check;
+    stock_check -> is_in_cart [label=" EVET "];
+    stock_check -> stock_fail [label=" HAYIR "];
+    stock_fail -> add_product_start;
+    
+    is_in_cart -> update_quantity [label=" EVET "];
+    is_in_cart -> add_new_item [label=" HAYIR "];
+    update_quantity -> apply_discount;
+    add_new_item -> apply_discount;
+    
+    apply_discount -> validate_code;
+    validate_code -> apply_discount_success [label=" EVET "];
+    validate_code -> discount_fail [label=" HAYIR "];
+    discount_fail -> calculate_shipping;
+    apply_discount_success -> calculate_shipping;
+    
+    calculate_shipping -> shipping_fee_calc;
+    shipping_fee_calc -> payment_start;
+    
+    payment_start -> payment_gateway -> payment_check;
+    payment_check -> order_success [label=" EVET "];
+    payment_check -> payment_fail [label=" HAYIR "];
+    payment_fail -> payment_start;
+    
+    order_success -> update_stock -> save_order -> send_email -> end_flow;
+}
+Bu DOT kodlarını herhangi bir çevrimiçi Graphviz görüntüleyicisine (örneğin, dreampuf.github.io/GraphvizOnline veya edotor.net) yapıştırarak akış şemalarının görsel hallerini oluşturabilirsiniz.
