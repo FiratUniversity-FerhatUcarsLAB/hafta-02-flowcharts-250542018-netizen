@@ -1,3 +1,1 @@
-
-
-sistemin kısa açıklaması (maks. 5-6 satır)
+E-ticaret sistemi, kullanıcının hesabına giriş yapıp sepetine ürün eklemesiyle başlar ve bu sırada sistem anlık stok kontrolü yapar. Ödeme aşamasında, girilen indirim kodları ve teslimat adresine göre hesaplanan kargo ücreti ile nihai tutar oluşturulur. Ardından, kart bilgileri güvenli bir ödeme ağ geçidi üzerinden doğrulanarak bankadan onay alınır. Başarılı onay sonrası sipariş oluşturulur, ürün stoğu otomatik olarak düşülür ve kullanıcıya sipariş onayı iletilir. Bu otomatize akış, güvenli ve verimli bir alışveriş süreci sağlar.
