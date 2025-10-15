@@ -1,0 +1,56 @@
+digraph DersKayitSistemiAkisi {
+    // Grafik için genel ayarlar
+    graph [charset="UTF-8", rankdir=TB, splines=ortho, labelloc="t", label="Üniversite Ders Kayıt Sistemi Akış Şeması"];
+    node [shape=box, style="rounded,filled", fillcolor="#E3F2FD", fontname="Arial"];
+    edge [fontname="Arial", fontsize=10];
+
+    // Başlangıç ve Bitiş Düğümleri
+    Basla [label="Başla", shape=ellipse, style=filled, fillcolor="#C8E6C9"];
+    Son [label="Süreç Tamamlandı", shape=ellipse, style=filled, fillcolor="#FFCDD2"];
+
+    // Ana İşlem Adımları
+    Giris [label="Öğrenci Sisteme Giriş Yapar"];
+    DersListesi [label="Açılan Dersler Listelenir"];
+    DersSec [label="Öğrenci Ders Seçer"];
+    SepeteEkle [label="Ders Başarıyla 'Ders Sepetine' Eklenir", style=filled, fillcolor="#A5D6A7"];
+    KaydiGonder [label="Kayıt Danışman Onayına Gönderilir"];
+    HataGoster [label="Hata Mesajı Gösterilir\n(Öğrenci bilgilendirilir)", style=filled, fillcolor="#EF9A9A"];
+
+    // Kontrol Noktaları (Karar Mekanizmaları)
+    KrediLimiti_Kontrol [label="Kredi Limiti Aşıldı mı?", shape=diamond, style=filled, fillcolor="#FFF9C4"];
+    Kontenjan_Kontrol [label="Kontenjan Dolu mu?", shape=diamond, style=filled, fillcolor="#FFF9C4"];
+    OnKosul_Kontrol [label="Ön Koşul Sağlanıyor mu?", shape=diamond, style=filled, fillcolor="#FFF9C4"];
+    Cakisma_Kontrol [label="Zaman Çakışması Var mı?", shape=diamond, style=filled, fillcolor="#FFF9C4"];
+    Onay_Kontrol [label="Kayıt Tamamlanıp\nOnaya Gönderilsin mi?", shape=diamond, style=filled, fillcolor="#BBDEFB"];
+
+
+    // Akışın Tanımlanması (Oklar)
+    Basla -> Giris;
+    Giris -> DersListesi;
+    
+    // Ders listesinden sonra öğrencinin iki seçeneği var: ya yeni ders seçer ya da kaydı tamamlar.
+    DersListesi -> Onay_Kontrol;
+    Onay_Kontrol -> DersSec [label=" Hayır, yeni ders seçeceğim "];
+    
+    // Ders seçimi sonrası başlayan kontrol zinciri
+    DersSec -> KrediLimiti_Kontrol;
+    KrediLimiti_Kontrol -> Kontenjan_Kontrol [label=" Hayır "];
+    KrediLimiti_Kontrol -> HataGoster [label=" Evet "];
+    
+    Kontenjan_Kontrol -> OnKosul_Kontrol [label=" Hayır "];
+    Kontenjan_Kontrol -> HataGoster [label=" Evet "];
+
+    OnKosul_Kontrol -> Cakisma_Kontrol [label=" Evet (Sağlanıyor) "];
+    OnKosul_Kontrol -> HataGoster [label=" Hayır (Sağlanmıyor) "];
+
+    Cakisma_Kontrol -> SepeteEkle [label=" Hayır (Çakışma Yok) "];
+    Cakisma_Kontrol -> HataGoster [label=" Evet (Çakışma Var) "];
+    
+    // Başarılı veya başarısız denemelerden sonra öğrenci tekrar ders listesine döner.
+    SepeteEkle -> DersListesi [label=" Listeye Dön "];
+    HataGoster -> DersListesi [label=" Listeye Dön "];
+    
+    // Öğrenci kaydı tamamlama kararı alırsa
+    Onay_Kontrol -> KaydiGonder [label=" Evet "];
+    KaydiGonder -> Son;
+}
