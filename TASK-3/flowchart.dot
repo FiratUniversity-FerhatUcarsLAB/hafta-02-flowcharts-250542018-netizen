@@ -1,0 +1,103 @@
+digraph AnaMenuSistemi {
+    // Grafik ayarları: Yukarıdan aşağıya akış, varsayılan stil ayarları
+    rankdir=TB;
+    node [shape=box, style="rounded,filled", fontname="Helvetica"];
+    edge [fontname="Helvetica"];
+
+    // --- ANA AKIŞ DÜĞÜMLERİ ---
+    Basla [label="Başla", shape=ellipse, fillcolor="#A8E6CF"];
+    KimlikDogrulama [label="1. Kimlik Doğrulama", fillcolor="#D7E3FC"];
+    GirisKontrolu [label="Giriş Başarılı mı?", shape=diamond, fillcolor="#FFD3B6"];
+    AnaMenuGoster [label="Ana Menü Gösterilir\n(1-Randevu, 2-Tahlil, 3-Çıkış)", shape=note, fillcolor="#FEF1A0"];
+    KullaniciSecimi [label="Kullanıcı Seçimi Nedir?", shape=diamond, fillcolor="#FFD3B6"];
+    
+    // Hata ve Çıkış Durumları
+    GirisHatali [label="Hata: Bilgiler Yanlış", shape=parallelogram, fillcolor="#FFAAA5"];
+    HataliSecim [label="Mesaj: Geçersiz Seçim", shape=parallelogram, fillcolor="#FFD3B6"];
+    CikisMesaji [label="Oturum Sonlandırılıyor...", shape=parallelogram, fillcolor="#A8E6CF"];
+    Son [label="Son", shape=ellipse, fillcolor="#FFAAA5"];
+
+    // --- ANA AKIŞIN BAĞLANTILARI ---
+    Basla -> KimlikDogrulama;
+    KimlikDogrulama -> GirisKontrolu;
+    GirisKontrolu -> AnaMenuGoster [label=" Evet"];
+    GirisKontrolu -> GirisHatali [label=" Hayır"];
+    GirisHatali -> Son;
+    
+    // Ana Menü Döngüsü
+    AnaMenuGoster -> KullaniciSecimi;
+    
+    // Geçersiz Seçim durumunda menüye geri dön
+    KullaniciSecimi -> HataliSecim [label=" Diğer"];
+    HataliSecim -> AnaMenuGoster;
+
+    // Çıkış seçeneği
+    KullaniciSecimi -> CikisMesaji [label=" \"3\""];
+    CikisMesaji -> Son;
+
+    // --- ALT SİSTEM 1: HASTANE RANDEVU SİSTEMİ (SubGraph) ---
+    subgraph cluster_RandevuSistemi {
+        label = "Randevu Alma Akışı";
+        style="filled,rounded";
+        fillcolor="#E6F2FF"; // Açık mavi arka plan
+
+        // Düğümler (RS = Randevu Sistemi)
+        RS_PoliklinikSecimi [label="Poliklinik Seçilir"];
+        RS_DoktorSecimi [label="Doktor Seçilir"];
+        RS_SaatGosterme [label="Uygun Saatler Gösterilir"];
+        RS_SaatKontrolu [label="Uygun Saat Bulundu mu?", shape=diamond];
+        RS_RandevuOnaylama [label="Randevu Onaylanır"];
+        RS_OnayKontrolu [label="Onaylandı mı?", shape=diamond];
+        RS_SmsGonderme [label="Onay SMS'i Gönderilir"];
+        RS_SaatYok [label="Mesaj: Uygun Saat Yok", shape=parallelogram];
+        RS_IptalEdildi [label="Mesaj: İşlem İptal Edildi", shape=parallelogram];
+        RS_RandevuBasarili [label="Randevu Başarılı"];
+        
+        // Akış
+        RS_PoliklinikSecimi -> RS_DoktorSecimi -> RS_SaatGosterme -> RS_SaatKontrolu;
+        RS_SaatKontrolu -> RS_RandevuOnaylama [label=" Evet"];
+        RS_SaatKontrolu -> RS_SaatYok [label=" Hayır"];
+        RS_RandevuOnaylama -> RS_OnayKontrolu;
+        RS_OnayKontrolu -> RS_SmsGonderme [label=" Evet"];
+        RS_OnayKontrolu -> RS_IptalEdildi [label=" Hayır"];
+        RS_SmsGonderme -> RS_RandevuBasarili;
+    }
+
+    // --- ALT SİSTEM 2: TAHLİL SONUÇ SİSTEMİ (SubGraph) ---
+    subgraph cluster_TahlilSistemi {
+        label = "Tahlil Sonucu Görüntüleme Akışı";
+        style="filled,rounded";
+        fillcolor="#E6FFEB"; // Açık yeşil arka plan
+
+        // Düğümler (TS = Tahlil Sistemi)
+        TS_TahlilSorgulama [label="Tahliller Sorgulanır"];
+        TS_TahlilVarmiKontrolu [label="Kayıtlı Tahlil Var mı?", shape=diamond];
+        TS_SonucHazirmiKontrolu [label="Sonuç Hazır mı?", shape=diamond];
+        TS_SonucuGoster [label="Sonuç Görüntülenir\nve PDF Seçeneği Sunulur"];
+        TS_TahlilYokMesaji [label="Mesaj: Tahlil Bulunamadı", shape=parallelogram];
+        TS_BeklemeMesaji [label="Mesaj: Sonuç Bekleniyor", shape=parallelogram];
+
+        // Akış
+        TS_TahlilSorgulama -> TS_TahlilVarmiKontrolu;
+        TS_TahlilVarmiKontrolu -> TS_SonucHazirmiKontrolu [label=" Evet"];
+        TS_TahlilVarmiKontrolu -> TS_TahlilYokMesaji [label=" Hayır"];
+        TS_SonucHazirmiKontrolu -> TS_SonucuGoster [label=" Evet"];
+        TS_SonucHazirmiKontrolu -> TS_BeklemeMesaji [label=" Hayır"];
+    }
+
+    // --- ANA MENÜ İLE ALT SİSTEMLER ARASINDAKİ BAĞLANTILAR ---
+
+    // Randevu Sistemi Bağlantısı
+    KullaniciSecimi -> RS_PoliklinikSecimi [label=" \"1\""];
+    // Randevu Sistemi bittiğinde Ana Menü'ye geri dön
+    RS_RandevuBasarili -> AnaMenuGoster;
+    RS_IptalEdildi -> AnaMenuGoster;
+    RS_SaatYok -> AnaMenuGoster;
+
+    // Tahlil Sonuç Sistemi Bağlantısı
+    KullaniciSecimi -> TS_TahlilSorgulama [label=" \"2\""];
+    // Tahlil Sistemi bittiğinde Ana Menü'ye geri dön
+    TS_SonucuGoster -> AnaMenuGoster;
+    TS_BeklemeMesaji -> AnaMenuGoster;
+    TS_TahlilYokMesaji -> AnaMenuGoster;
+}
