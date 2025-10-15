@@ -1,3 +1,2 @@
 
-
-sistemin kısa açıklaması (maks. 5-6 satır)
+akıllı ev güvenlik sisteminin 7/24 çalışma mantığını, koşula bağlı katmanlı bir yapıda modellemektedir. Kod, ana "Sistem Aktif mi?" kontrolünden geçtikten sonra, sensör verilerini analiz ederek potansiyel bir tehdidi "yanlış alarm" filtresinden (ev sahibi konumu kontrolü) geçirmektedir. Gerçek bir tehdit durumunda, olayın ciddiyetine göre dinamik olarak bir alarm seviyesi belirlemekte, çok kanallı bildirimler göndermekte ve son olarak kullanıcıya sistemi uzaktan sıfırlama imkânı tanımaktadır. Bu süreç, kesintisiz bir döngü içerisinde tekrarlanacak şekilde tasarlanmıştır.
