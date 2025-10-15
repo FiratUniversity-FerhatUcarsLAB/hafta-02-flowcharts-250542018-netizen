@@ -1,0 +1,509 @@
+//ben
+
+Hastane randevu sistemi icin algoritma: kimlik dogrulama, poliklinik
+secimi, doktor listesi goruntuleme, uygun saatleri gosterme, randevu
+onaylama ve SMS gonderme. Pseudocode yaz bunu yaparken üniverte
+1. sınıf öğrencisinin anlayacağı şekilde tane tane anlat ve en son tüm kodu topla 
+
+//LLM
+
+Harika bir proje konusu! Bir hastane randevu sistemi algoritmasını, üniversite birinci sınıf öğrencisinin anlayacağı şekilde adım adım, tane tane anlatalım ve her adım için sözde kodunu (pseudocode) yazalım. En sonda da tüm bu adımları birleştirelim.
+
+Algoritma ve Pseudocode Nedir?
+Öncelikle bu iki kavramı basitçe hatırlayalım:
+
+Algoritma: Bir problemi çözmek veya bir görevi tamamlamak için izlenen, sonlu ve net adımlardan oluşan bir yol haritasıdır. Tıpkı bir yemek tarifi gibidir; adımları doğru sırayla takip ederseniz sonuca ulaşırsınız.
+
+Pseudocode (Sözde Kod): Algoritmayı, belirli bir programlama dilinin (Python, Java, C# gibi) katı kurallarına bağlı kalmadan, konuşma diline yakın bir şekilde yazmaktır. Amacı, kodun mantığını herkesin anlayabileceği şekilde ifade etmektir.
+
+Şimdi hastane randevu sistemimizin adımlarını tek tek inceleyelim.
+
+Adım 1: Kimlik Doğrulama (Authentication)
+Tane Tane Anlatım:
+Bu adım, sisteme kimin giriş yapmaya çalıştığını anlamak içindir. Tıpkı sosyal medya hesabınıza girerken kullanıcı adı ve şifre sorması gibi. Sistem, kullanıcıdan T.C. Kimlik Numarası ve bir parola (örneğin doğum yılı veya e-Devlet şifresi) ister. Bu bilgileri, hastanenin veritabanındaki kayıtlarla karşılaştırır. Bilgiler eşleşiyorsa kullanıcıya "Hoş geldiniz!" der ve içeri alır. Eşleşmiyorsa "Bilgileriniz hatalı." diye uyarı verir.
+
+Pseudocode (Sözde Kod):
+
+FONKSİYON KimlikDoğrula():
+  GÖSTER "T.C. Kimlik Numaranızı Giriniz:"
+  OKU kullanici_tc
+
+  GÖSTER "Şifrenizi (örn: Doğum Yılınız) Giriniz:"
+  OKU kullanici_sifre
+
+  // Veritabanından bu TC'ye ait kullanıcıyı bulmaya çalış
+  hasta_kaydi = VeritabanındaAra(kullanici_tc)
+
+  // Kullanıcı bulundu mu ve şifre doğru mu?
+  EĞER hasta_kaydi VARSA VE hasta_kaydi.sifre == kullanici_sifre İSE
+    DÖNDÜR DOĞRU  // Giriş başarılı
+  DEĞİLSE
+    DÖNDÜR YANLIŞ // Giriş başarısız
+  BİTİR EĞER
+BİTİR FONKSİYON
+Adım 2: Poliklinik Seçimi (Clinic Selection)
+Tane Tane Anlatım:
+Kullanıcı sisteme başarıyla giriş yaptıktan sonra, ona hangi bölümden randevu almak istediğini sormalıyız. Sistem, veritabanında kayıtlı olan tüm polikliniklerin (Kardiyoloji, Göz Hastalıkları, Ortopedi vb.) bir listesini ekrana getirir. Kullanıcı bu listeden birini seçer.
+
+Pseudocode (Sözde Kod):
+
+FONKSİYON PoliklinikSectir():
+  // Veritabanından mevcut tüm poliklinikleri al
+  poliklinik_listesi = VeritabanındanPoliklinikleriGetir()
+
+  GÖSTER "Lütfen randevu almak istediğiniz polikliniği seçiniz:"
+  GÖSTER poliklinik_listesi // Listeyi ekrana yazdır
+
+  OKU secilen_poliklinik // Kullanıcının seçimini al
+
+  DÖNDÜR secilen_poliklinik
+BİTİR FONKSİYON
+Adım 3: Doktor Listesi Görüntüleme (Displaying Doctor List)
+Tane Tane Anlatım:
+Kullanıcı polikliniği seçti. Şimdi, o poliklinikte görev yapan doktorları ona göstermeliyiz. Sistem, bir önceki adımda seçilen polikliniğe göre veritabanından ilgili doktorların listesini çeker ve ekranda gösterir. Kullanıcı bu doktorlardan birini seçer.
+
+Pseudocode (Sözde Kod):
+
+FONKSİYON DoktorSectir(poliklinik):
+  // Seçilen polikliniğe ait doktorları veritabanından al
+  doktor_listesi = VeritabanındanDoktorlarıGetir(poliklinik)
+
+  GÖSTER poliklinik + " bölümündeki doktorlarımız:"
+  GÖSTER doktor_listesi
+
+  GÖSTER "Lütfen bir doktor seçiniz:"
+  OKU secilen_doktor
+
+  DÖNDÜR secilen_doktor
+BİTİR FONKSİYON
+Adım 4: Uygun Saatleri Gösterme (Showing Available Slots)
+Tane Tane Anlatım:
+Artık hangi doktordan randevu alınacağını biliyoruz. Bu adımda, seçilen doktorun takvimini kontrol etmeliyiz. Sistem, doktorun o gün veya seçilen gün için dolu olan randevu saatlerini ayıklar ve sadece boş olan (uygun) saatleri kullanıcıya bir liste halinde sunar. Kullanıcı bu listeden kendisine uyan bir saati seçer.
+
+Pseudocode (Sözde Kod):
+
+FONKSİYON SaatSectir(doktor):
+  // Seçilen doktora ait boş randevu saatlerini veritabanından al
+  uygun_saatler = VeritabanındanUygunSaatleriGetir(doktor)
+
+  // Eğer hiç boş saat yoksa
+  EĞER uygun_saatler LİSTESİ BOŞ İSE
+    GÖSTER "Seçtiğiniz doktor için uygun randevu saati bulunmamaktadır."
+    DÖNDÜR HİÇBİR_ŞEY // Boş bir değer döndür
+  DEĞİLSE
+    GÖSTER doktor + " için uygun randevu saatleri:"
+    GÖSTER uygun_saatler
+
+    GÖSTER "Lütfen bir saat seçiniz:"
+    OKU secilen_saat
+    DÖNDÜR secilen_saat
+  BİTİR EĞER
+BİTİR FONKSİYON
+Adım 5: Randevu Onaylama (Appointment Confirmation)
+Tane Tane Anlatım:
+Kullanıcı tüm seçimlerini yaptı. İşlemi bitirmeden önce, her şeyin doğru olduğundan emin olmak için bir özet göstermeliyiz. Ekrana "Şu poliklinikte, şu doktor ile şu saatte randevu almak üzeresiniz. Onaylıyor musunuz? (Evet/Hayır)" gibi bir mesaj çıkar. Kullanıcı "Evet" derse, bu randevu bilgisi veritabanına kaydedilir ve o saat artık başka bir hastaya gösterilmez. "Hayır" derse işlem iptal edilir.
+
+Pseudocode (Sözde Kod):
+
+FONKSİYON RandevuOnayla(hasta_bilgisi, poliklinik, doktor, saat):
+  GÖSTER "--- RANDEVU ÖZETİ ---"
+  GÖSTER "Poliklinik: " + poliklinik
+  GÖSTER "Doktor: " + doktor
+  GÖSTER "Tarih ve Saat: " + saat
+  GÖSTER "Yukarıdaki bilgileri onaylıyor musunuz? (Evet/Hayır)"
+
+  OKU onay_cevabi
+
+  EĞER onay_cevabi == "Evet" İSE
+    // Randevuyu veritabanına kaydetme işlemi
+    VeritabanınaKaydet(hasta_bilgisi, poliklinik, doktor, saat)
+    GÖSTER "Randevunuz başarıyla oluşturulmuştur."
+    DÖNDÜR DOĞRU
+  DEĞİLSE
+    GÖSTER "Randevu işlemi iptal edildi."
+    DÖNDÜR YANLIŞ
+  BİTİR EĞER
+BİTİR FONKSİYON
+Adım 6: SMS Gönderme (Sending SMS)
+Tane Tane Anlatım:
+Randevu başarıyla onaylandıktan sonra, kullanıcıya bir bilgilendirme mesajı göndermek harika olur. Sistem, randevuyu alan hastanın veritabanında kayıtlı telefon numarasını bulur. Ardından, randevu detaylarını içeren (doktor adı, poliklinik, tarih, saat vb.) bir metin oluşturur ve bu metni bir SMS servis aracılığıyla hastanın telefonuna gönderir.
+
+Pseudocode (Sözde Kod):
+
+PROSEDÜR SmsGonder(hasta_bilgisi, randevu_detaylari):
+  telefon_no = VeritabanındanTelefonNoBul(hasta_bilgisi)
+  
+  mesaj = "Sayın " + hasta_bilgisi.isim + ", " + randevu_detaylari + " için randevunuz oluşturulmuştur. Sağlıklı günler dileriz."
+  
+  // Bu mesajı SMS olarak gönderen bir dış servisi çağır
+  SmsServisineGonder(telefon_no, mesaj)
+BİTİR PROSEDÜR
+(Not: Bu adım bir değer döndürmediği, sadece bir işlem yaptığı için "FONKSİYON" yerine "PROSEDÜR" olarak adlandırılabilir.)
+
+Tüm Adımların Birleştirilmiş Pseudocode'u
+Şimdi tüm bu parçaları bir ana program içinde birleştirelim. Bu, adımların birbiriyle nasıl konuştuğunu ve sürecin baştan sona nasıl aktığını gösterir.
+
+PROGRAM HastaneRandevuSistemi
+
+  BAŞLA
+    // Adım 1: Kimlik Doğrulama
+    giris_basarili_mi = KimlikDoğrula()
+
+    EĞER giris_basarili_mi == DOĞRU İSE
+      GÖSTER "Giriş başarılı!"
+      
+      // Adım 2: Poliklinik Seçimi
+      secilen_poliklinik = PoliklinikSectir()
+
+      // Adım 3: Doktor Seçimi
+      secilen_doktor = DoktorSectir(secilen_poliklinik)
+
+      // Adım 4: Saat Seçimi
+      secilen_saat = SaatSectir(secilen_doktor)
+
+      // Kullanıcı uygun saat bulup seçti mi?
+      EĞER secilen_saat != HİÇBİR_ŞEY İSE
+      
+        // Adım 5: Randevu Onayı
+        // hasta_bilgisi'nin giriş yapmış kullanıcı bilgisi olduğunu varsayalım
+        onay_durumu = RandevuOnayla(hasta_bilgisi, secilen_poliklinik, secilen_doktor, secilen_saat)
+
+        // Randevu onaylandı mı?
+        EĞER onay_durumu == DOĞRU İSE
+          // Adım 6: SMS Gönderme
+          randevu_bilgileri = secilen_poliklinik + ", " + secilen_doktor + ", " + secilen_saat
+          SmsGonder(hasta_bilgisi, randevu_bilgileri)
+        BİTİR EĞER
+
+      BİTİR EĞER
+
+    DEĞİLSE
+      GÖSTER "T.C. Kimlik No veya şifre hatalı. Lütfen tekrar deneyin."
+    BİTİR EĞER
+
+  BİTİR
+
+// ------------ KULLANILAN FONKSİYONLARIN TANIMLARI AŞAĞIDADIR ------------
+
+FONKSİYON KimlikDoğrula(): ... (Yukarıdaki gibi)
+FONKSİYON PoliklinikSectir(): ... (Yukarıdaki gibi)
+FONKSİYON DoktorSectir(poliklinik): ... (Yukarıdaki gibi)
+FONKSİYON SaatSectir(doktor): ... (Yukarıdaki gibi)
+FONKSİYON RandevuOnayla(hasta_bilgisi, poliklinik, doktor, saat): ... (Yukarıdaki gibi)
+PROSEDÜR SmsGonder(hasta_bilgisi, randevu_detaylari): ... (Yukarıdaki gibi)
+
+//ben
+bu kodu dot koduna çevir
+
+//LLM
+
+digraph HastaneRandevuSistemi {
+    // Grafik ayarları: Yukarıdan aşağıya akış ve genel düğüm/kenar stilleri
+    rankdir=TB;
+    node [shape=box, style="rounded,filled", fontname="Helvetica"];
+    edge [fontname="Helvetica"];
+
+    // Düğüm (Node) Tanımlamaları
+    // Farklı türdeki adımlar için farklı şekil ve renkler kullanalım
+    Basla [label="Başla", shape=ellipse, fillcolor="#A8E6CF"];
+    KimlikDogrulama [label="1. Kimlik Doğrulama Yapılır", fillcolor="#D7E3FC"];
+    GirisKontrolu [label="Giriş Başarılı mı?", shape=diamond, fillcolor="#FFD3B6"];
+    PoliklinikSecimi [label="2. Poliklinik Seçilir", fillcolor="#D7E3FC"];
+    DoktorSecimi [label="3. Doktor Seçilir", fillcolor="#D7E3FC"];
+    SaatGosterme [label="4. Uygun Saatler Gösterilir", fillcolor="#D7E3FC"];
+    SaatKontrolu [label="Uygun Saat Bulundu mu?", shape=diamond, fillcolor="#FFD3B6"];
+    RandevuOnaylama [label="5. Randevu Bilgileri Onaylanır", fillcolor="#D7E3FC"];
+    OnayKontrolu [label="Kullanıcı Onayladı mı?", shape=diamond, fillcolor="#FFD3B6"];
+    SmsGonderme [label="6. Onay SMS'i Gönderilir", fillcolor="#D7E3FC"];
+    
+    // Sonuç ve Hata Durumları
+    GirisHatali [label="Hata: Bilgiler Yanlış", shape=parallelogram, fillcolor="#FFAAA5"];
+    SaatYok [label="Mesaj: Uygun Saat Yok", shape=parallelogram, fillcolor="#FFD3B6"];
+    IptalEdildi [label="Mesaj: İşlem İptal Edildi", shape=parallelogram, fillcolor="#FFD3B6"];
+    RandevuBasarili [label="Randevu Başarıyla Oluşturuldu", shape=parallelogram, fillcolor="#A8E6CF"];
+    Son [label="Son", shape=ellipse, fillcolor="#FFAAA5"];
+
+    // Akış (Edge) Tanımlamaları
+    Basla -> KimlikDogrulama;
+    KimlikDogrulama -> GirisKontrolu;
+
+    // Giriş kontrolünden sonraki yollar
+    GirisKontrolu -> PoliklinikSecimi [label=" Evet"];
+    GirisKontrolu -> GirisHatali [label=" Hayır"];
+    GirisHatali -> Son;
+
+    // Başarılı giriş sonrası adımlar
+    PoliklinikSecimi -> DoktorSecimi;
+    DoktorSecimi -> SaatGosterme;
+    SaatGosterme -> SaatKontrolu;
+
+    // Saat kontrolünden sonraki yollar
+    SaatKontrolu -> RandevuOnaylama [label=" Evet"];
+    SaatKontrolu -> SaatYok [label=" Hayır"];
+    SaatYok -> Son;
+
+    // Randevu onayından sonraki yollar
+    RandevuOnaylama -> OnayKontrolu;
+    OnayKontrolu -> SmsGonderme [label=" Evet"];
+    OnayKontrolu -> IptalEdildi [label=" Hayır"];
+    IptalEdildi -> Son;
+
+    // Başarılı son
+    SmsGonderme -> RandevuBasarili;
+    RandevuBasarili -> Son;
+}
+
+//ben
+“Tahlil sonucu goruntuleme sistemi: kimlik dogrulama, tahlil varlıgı
+kontrolu, sonuc hazır mı kontrolu, goruntuleme veya bekleme mesajı, PDF
+indirme. Pseudocode yaz.” 
+
+//LLM
+
+Harika bir konu! Bir tahlil sonucu görüntüleme sisteminin algoritmasını ve sözde kodunu (pseudocode), yine üniversite 1. sınıf öğrencisinin rahatça anlayacağı şekilde, adım adım oluşturalım.
+
+Algoritmanın Adım Adım Açıklaması
+Sistemin temel amacı, bir hastanın kimliğini doğruladıktan sonra ona ait tahlil sonuçlarını güvenli bir şekilde sunmaktır. Eğer sonuçlar henüz çıkmamışsa, bu durumu da kullanıcıya bildirmelidir.
+
+Adım 1: Kimlik Doğrulama (Authentication)
+Tane Tane Anlatım:
+Bu ilk ve en önemli adımdır. Kullanıcının başkasının sonuçlarını görmesini engellemek için sisteme kim olduğunu kanıtlaması gerekir. Sistem, kullanıcıdan T.C. Kimlik Numarası ve genellikle barkod numarası veya bir parola gibi ikinci bir bilgi ister. Bu bilgiler veritabanındaki kayıtlarla eşleşirse, kullanıcı sisteme giriş yapabilir. Eşleşmezse, hata mesajı gösterilir.
+
+Pseudocode (Sözde Kod):
+
+FONKSİYON KimlikDoğrula():
+  GÖSTER "T.C. Kimlik Numaranızı Giriniz:"
+  OKU kullanici_tc
+
+  GÖSTER "Parolanızı veya Barkod Numaranızı Giriniz:"
+  OKU kullanici_sifre
+
+  // Veritabanından bu TC'ye ait hasta kaydını bul
+  hasta_kaydi = VeritabanındaHastaAra(kullanici_tc)
+
+  // Hasta bulundu mu ve şifre/barkod doğru mu?
+  EĞER hasta_kaydi VARSA VE hasta_kaydi.sifre == kullanici_sifre İSE
+    DÖNDÜR hasta_kaydi // Giriş başarılı, hasta bilgilerini döndür
+  DEĞİLSE
+    DÖNDÜR HİÇBİR_ŞEY // Giriş başarısız, boş değer döndür
+  BİTİR EĞER
+BİTİR FONKSİYON
+Adım 2: Tahlil Varlığı Kontrolü (Analysis Existence Check)
+Tane Tane Anlatım:
+Kullanıcı başarıyla giriş yaptıktan sonra, sistem bu hastaya ait herhangi bir tahlil kaydı olup olmadığını kontrol eder. Belki de kullanıcı sisteme kayıtlıdır ama hiç tahlil yaptırmamıştır. Sistem, hastanın kimlik bilgisiyle tahlil kayıtlarını sorgular.
+
+Pseudocode (Sözde Kod):
+(Bu adımı bir sonraki adımla birleştireceğiz çünkü mantıksal olarak bir bütünler.)
+
+Adım 3: Sonuç Hazır mı Kontrolü (Result Status Check)
+Tane Tane Anlatım:
+Eğer hastaya ait tahlil kayıtları bulunduysa, şimdi bu tahlillerin durumunu kontrol etmeliyiz. Bir tahlilin durumu genellikle "Sonuç Bekleniyor", "İşleme Alındı" veya "Hazır" gibi ifadelerle belirtilir. Sistem, her bir tahlilin durumunu veritabanından okur.
+
+Adım 4: Görüntüleme veya Bekleme Mesajı (Display or Wait Message)
+Tane Tane Anlatım:
+Bu adım, 3. adımın sonucuna göre çalışır.
+
+Eğer tahlil durumu "Hazır" ise: Sistem, tahlile ait tüm detayları (parametreler, değerler, referans aralıkları vb.) veritabanından çeker ve kullanıcıya okunaklı bir şekilde ekranda gösterir.
+
+Eğer tahlil durumu "Hazır" değilse: Kullanıcıya boş bir ekran göstermek yerine, "Tahlil sonucunuz henüz hazırlanmamıştır. Lütfen daha sonra tekrar kontrol ediniz." gibi bilgilendirici bir mesaj gösterilir.
+
+Adım 5: PDF Olarak İndirme (PDF Download)
+Tane Tane Anlatım:
+Sonucu "Hazır" olan ve ekranda görüntülenen tahliller için kullanıcıya bir "PDF Olarak İndir" butonu sunulur. Kullanıcı bu butona tıkladığında, sistem görüntülenen sonuçları resmi bir formatta PDF dosyasına dönüştürür ve kullanıcının bilgisayarına veya telefonuna indirmesini sağlar. Bu, hastanın sonuçlarını saklaması veya bir doktora yazdırması için çok kullanışlıdır.
+
+Tüm Adımların Birleştirilmiş Pseudocode'u
+Şimdi tüm bu mantığı, baştan sona çalışan bir ana program akışı içinde birleştirelim.
+
+PROGRAM TahlilSonucuSistemi
+
+  BAŞLA
+    // Adım 1: Kimlik Doğrulama
+    giris_yapan_hasta = KimlikDoğrula()
+
+    // Giriş başarılı oldu mu?
+    EĞER giris_yapan_hasta != HİÇBİR_ŞEY İSE
+      GÖSTER "Giriş başarılı! Sonuçlarınız sorgulanıyor..."
+
+      // Adım 2: Tahlil Varlığı Kontrolü
+      // Giriş yapan hastanın kimlik bilgisiyle tahlilleri bul
+      hasta_tahlilleri = VeritabanındanTahlilleriGetir(giris_yapan_hasta.id)
+
+      // Hastanın hiç tahlili var mı?
+      EĞER hasta_tahlilleri LİSTESİ BOŞ İSE
+        GÖSTER "Sistemde adınıza kayıtlı herhangi bir tahlil bulunmamaktadır."
+      DEĞİLSE
+        // Hastanın tahlilleri listelenir (örneğin en yeniden en eskiye)
+        GÖSTER "Tahlilleriniz:"
+        
+        // Listedeki her bir tahlil için döngü kur
+        HER tahlil İÇİN hasta_tahlilleri LİSTESİNDE:
+          
+          // Adım 3: Sonuç Hazır mı Kontrolü
+          EĞER tahlil.durum == "Hazır" İSE
+            // Adım 4 (Görüntüleme) ve Adım 5 (PDF İndirme)
+            GÖSTER tahlil.tarih + " tarihli " + tahlil.adi + " Sonucu: [Sonucu Görüntüle] [PDF İndir]"
+          DEĞİLSE
+            // Adım 4 (Bekleme Mesajı)
+            GÖSTER tahlil.tarih + " tarihli " + tahlil.adi + " Sonucu: Henüz Hazır Değil"
+          BİTİR EĞER
+        
+        BİTİR DÖNGÜ
+      BİTİR EĞER
+
+    DEĞİLSE
+      GÖSTER "Hata: Girdiğiniz bilgiler hatalıdır. Lütfen tekrar deneyiniz."
+    BİTİR EĞER
+
+  BİTİR
+
+// ------------ KULLANILAN FONKSİYONLARIN TANIMLARI ------------
+
+// Kullanıcıdan kimlik bilgisi alıp doğrulayan fonksiyon
+FONKSİYON KimlikDoğrula(): ... (Yukarıdaki gibi)
+
+// Verilen hasta kimliğine göre veritabanından tahlil kayıtlarını getiren fonksiyon
+FONKSİYON VeritabanındanTahlilleriGetir(hasta_id):
+  // Veritabanında bu hasta_id'ye ait tüm tahlil kayıtlarını bul ve liste olarak döndür.
+  // Bu liste, her tahlilin adını, tarihini ve durumunu ("Hazır", "Beklemede" vb.) içermeli.
+  DÖNDÜR tahlil_listesi
+BİTİR FONKSİYON
+
+// Kullanıcı [PDF İndir] seçeneğine tıkladığında çalışacak olan prosedür
+PROSEDÜR PdfOlusturVeIndir(tahlil_id):
+  // Veritabanından tahlil_id'ye ait detaylı sonuçları al
+  sonuc_detaylari = VeritabanındanSonucDetaylariniGetir(tahlil_id)
+  
+  // Bu detayları kullanarak bir PDF dosyası oluştur
+  pdf_dosyasi = PdfUretici(sonuc_detaylari)
+  
+  // Kullanıcının bu dosyayı indirmesini sağla
+  KullaniciyaIndirt(pdf_dosyasi)
+BİTİR PROSEDÜR
+
+//ben
+
+bu iki farklı pseudocode codu ana menü uygulaması yap ve birleştir pseudocode olarak yaz sonra
+
+//LLM
+
+Harika bir fikir! Daha önce oluşturduğumuz iki ayrı sistemi (Hastane Randevu ve Tahlil Sonucu Görüntüleme) tek bir çatı altında birleştiren bir "Ana Menü Uygulaması" için pseudocode yazalım. Bu, modüler programlama mantığını anlamak için de mükemmel bir örnektir.
+
+Algoritmanın Mantığı ve Birleştirme Stratejisi
+Tek Bir Giriş (Single Sign-On): Kullanıcının her işlem için tekrar tekrar kimlik doğrulaması yapması can sıkıcı olurdu. Bu yüzden sistem, kullanıcıyı sadece bir kez doğrular. Başarılı bir girişten sonra, kullanıcıyı bir ana menü karşılar.
+
+Ana Menü: Bu menü, kullanıcının yapmak istediği işlemi seçmesine olanak tanır. Örneğin, "1- Randevu Al", "2- Tahlil Sonuçlarımı Gör", "3- Çıkış Yap" gibi seçenekler sunar.
+
+Modüler Yapı: Her bir menü seçeneği, daha önce yazdığımız ilgili pseudocode bloğunu (prosedürü) çağırır. Örneğin, kullanıcı "1"i seçerse, randevu alma akışını başlatan prosedür çalışır.
+
+Sürekli Çalışma: Kullanıcı bir işlemi tamamladıktan sonra (randevu almak veya sonuçlara bakmak gibi), program sonlanmaz. Bunun yerine, kullanıcı "Çıkış" seçeneğini seçene kadar onu ana menüye geri döndürür. Bu, bir döngü (loop) ile sağlanır.
+
+Birleştirilmiş Ana Menü Uygulaması Pseudocode'u
+Aşağıda, bu mantığa uygun olarak hazırlanmış, tane tane açıklanmış sözde kod bulunmaktadır.
+
+PROGRAM HastaBilgiSistemiAnaMenu
+
+  BAŞLA
+    // --- ADIM 1: TEK SEFERLİK KİMLİK DOĞRULAMA ---
+    // Kullanıcıyı sisteme almadan önce kim olduğunu doğrula.
+    giris_yapan_hasta = KimlikDoğrula()
+
+    // Giriş başarılı olduysa, yani fonksiyon boş bir değer döndürmediyse...
+    EĞER giris_yapan_hasta != HİÇBİR_ŞEY İSE
+      GÖSTER "Hoş geldiniz, " + giris_yapan_hasta.isim
+
+      // --- ADIM 2: ANA MENÜ DÖNGÜSÜ ---
+      // Kullanıcı çıkış yapmadığı sürece menüyü göstermeye devam et.
+      SÜRECE DOĞRU: // Sonsuz bir döngü başlat
+      
+        GÖSTER "------------------------------------"
+        GÖSTER "Lütfen yapmak istediğiniz işlemi seçiniz:"
+        GÖSTER "1: Hastane Randevu İşlemleri"
+        GÖSTER "2: Tahlil Sonuçlarımı Görüntüle"
+        GÖSTER "3: Çıkış Yap"
+        GÖSTER "------------------------------------"
+        OKU secim
+
+        // --- ADIM 3: KULLANICI SEÇİMİNİ YÖNLENDİRME ---
+        // Kullanıcının seçimine göre ilgili prosedürü çalıştır.
+        SEÇİM DURUMU secim:
+          DURUM "1":
+            // Randevu sistemi akışını başlat.
+            RandevuIslemleriniBaslat(giris_yapan_hasta)
+            
+          DURUM "2":
+            // Tahlil sonucu görüntüleme akışını başlat.
+            TahlilSonuclariniGoster(giris_yapan_hasta)
+            
+          DURUM "3":
+            GÖSTER "Oturumunuz sonlandırılıyor. İyi günler dileriz."
+            DÖNGÜDEN ÇIK // Sonsuz döngüyü sonlandır.
+            
+          VARSAYILAN: // 1, 2 veya 3 dışında bir şey girildiyse
+            GÖSTER "Hatalı seçim yaptınız. Lütfen menüden geçerli bir numara giriniz."
+        BİTİR SEÇİM DURUMU
+        
+      BİTİR DÖNGÜ
+
+    DEĞİLSE // Kimlik doğrulama başarısız olduysa
+      GÖSTER "Hata: Girdiğiniz bilgiler hatalıdır. Sistem kapatılıyor."
+    BİTİR EĞER
+
+  BİTİR
+
+// ######################################################################
+// # ANA MENÜNÜN ÇAĞIRDIĞI ANA PROSEDÜRLER                             #
+// ######################################################################
+
+PROSEDÜR RandevuIslemleriniBaslat(hasta_bilgisi):
+  GÖSTER "\n*** Randevu Sistemi Başlatıldı ***"
+  secilen_poliklinik = PoliklinikSectir()
+  secilen_doktor = DoktorSectir(secilen_poliklinik)
+  secilen_saat = SaatSectir(secilen_doktor)
+
+  EĞER secilen_saat != HİÇBİR_ŞEY İSE
+    onay_durumu = RandevuOnayla(hasta_bilgisi, secilen_poliklinik, secilen_doktor, secilen_saat)
+    EĞER onay_durumu == DOĞRU İSE
+      randevu_bilgileri = secilen_poliklinik + ", " + secilen_doktor + ", " + secilen_saat
+      SmsGonder(hasta_bilgisi, randevu_bilgileri)
+    BİTİR EĞER
+  BİTİR EĞER
+  GÖSTER "*** Randevu Sistemi Tamamlandı. Ana Menüye Dönülüyor... ***\n"
+BİTİR PROSEDÜR
+
+
+PROSEDÜR TahlilSonuclariniGoster(hasta_bilgisi):
+  GÖSTER "\n*** Tahlil Sonuç Sistemi Başlatıldı ***"
+  hasta_tahlilleri = VeritabanındanTahlilleriGetir(hasta_bilgisi.id)
+
+  EĞER hasta_tahlilleri LİSTESİ BOŞ İSE
+    GÖSTER "Sistemde adınıza kayıtlı herhangi bir tahlil bulunmamaktadır."
+  DEĞİLSE
+    GÖSTER "Tahlilleriniz:"
+    HER tahlil İÇİN hasta_tahlilleri LİSTESİNDE:
+      EĞER tahlil.durum == "Hazır" İSE
+        GÖSTER tahlil.tarih + " - " + tahlil.adi + ": [Sonucu Görüntüle] [PDF İndir]"
+      DEĞİLSE
+        GÖSTER tahlil.tarih + " - " + tahlil.adi + ": Henüz Hazır Değil"
+      BİTİR EĞER
+    BİTİR DÖNGÜ
+  BİTİR EĞER
+  GÖSTER "*** Tahlil Sonuç Sistemi Tamamlandı. Ana Menüye Dönülüyor... ***\n"
+BİTİR PROSEDÜR
+
+
+// ######################################################################
+// # YARDIMCI FONKSİYONLAR VE PROSEDÜRLER (Detayları önceki kodlarda) #
+// ######################################################################
+
+// Bu fonksiyonlar, yukarıdaki ana prosedürler tarafından kullanılır.
+// Tanımları, daha önceki örneklerde yazdığımız gibidir.
+
+FONKSİYON KimlikDoğrula(): ...
+FONKSİYON PoliklinikSectir(): ...
+FONKSİYON DoktorSectir(poliklinik): ...
+FONKSİYON SaatSectir(doktor): ...
+FONKSİYON RandevuOnayla(hasta_bilgisi, poliklinik, doktor, saat): ...
+PROSEDÜR SmsGonder(hasta_bilgisi, randevu_detaylari): ...
+FONKSİYON VeritabanındanTahlilleriGetir(hasta_id): ...
+PROSEDÜR PdfOlusturVeIndir(tahlil_id): ...
+
