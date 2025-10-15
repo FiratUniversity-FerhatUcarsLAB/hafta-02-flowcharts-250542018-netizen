@@ -1,3 +1,2 @@
 
-
-sistemin kısa açıklaması (maks. 5-6 satır)
+hastane randevu ve tahlil sonucu görüntüleme sistemlerini tek bir ana menü altında birleştiren uygulamanın mantıksal akış şemasıdır. Kullanıcı, tek bir kimlik doğrulama adımından sonra ana menüye ulaşır ve yaptığı seçime göre ilgili alt sisteme yönlendirilir. Her alt sistemdeki işlem tamamlandıktan sonra akış, kullanıcı "Çıkış" yapana kadar tekrar ana menüye dönerek bir döngü oluşturur. Şemadaki çerçeveli alanlar (subgraph), bu modüler yapıyı görsel olarak birbirinden ayırmak için kullanılmıştır.
