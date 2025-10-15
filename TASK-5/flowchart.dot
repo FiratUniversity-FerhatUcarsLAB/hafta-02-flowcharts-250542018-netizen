@@ -1,0 +1,43 @@
+digraph DetayliGuvenlikSistemi {
+    // Grafik için genel ayarlar
+    graph [charset="UTF-8", rankdir=TB, splines=ortho, labelloc="t", label="Detaylı Akıllı Ev Güvenlik Sistemi Akış Şeması"];
+    node [shape=box, style="rounded,filled", fillcolor="#E3F2FD", fontname="Arial"];
+    edge [fontname="Arial", fontsize=10];
+
+    // Düğümler (İşlemler ve Kararlar)
+    Basla [label="Sistem Başlatıldı", shape=ellipse, style=filled, fillcolor="#C8E6C9"];
+    Sistem_Aktif_Mi [label="Sistem Aktif mi?", shape=diamond, style=filled, fillcolor="#BBDEFB"];
+    Sensorleri_Oku [label="Sensörleri Oku\n(Hareket, Kapı/Pencere)"];
+    Tehdit_Algilandi_Mi [label="Tehdit Algılandı mı?", shape=diamond, style=filled, fillcolor="#FFF9C4"];
+    Ev_Sahibi_Evde_Mi [label="Yanlış Alarm Kontrolü:\nEv Sahibi Evde mi?", shape=diamond, style=filled, fillcolor="#FFF9C4"];
+    Kameralari_Aktif_Et [label="Kameraları Aktif Et\nve Kayda Başla"];
+    Alarm_Seviyesi_Belirle [label="Alarm Seviyesi Belirle\n(1-2-3)"];
+    Alarmi_Cal [label="Alarmı Çal ve\n3 Kanallı Bildirim Gönder\n(SMS, App, Email)", style=filled, fillcolor="#FFCDD2"];
+    Kullanici_Komutu_Kontrol [label="Kullanıcı Alarmı\nSıfırladı mı?", shape=diamond, style=filled, fillcolor="#BBDEFB"];
+    Sistemi_Sifirla [label="Alarmı Durdur ve\nSistemi Sıfırla", style=filled, fillcolor="#A5D6A7"];
+    Bekle [label="5 Saniye Bekle"];
+    Son [label="Döngü Başı", shape=point];
+
+    // Akışın Tanımlanması (Oklar)
+    Basla -> Sistem_Aktif_Mi;
+    
+    Sistem_Aktif_Mi -> Sensorleri_Oku [label=" Evet "];
+    Sistem_Aktif_Mi -> Bekle [label=" Hayır (Pasif Mod) "];
+    
+    Sensorleri_Oku -> Tehdit_Algilandi_Mi;
+    Tehdit_Algilandi_Mi -> Ev_Sahibi_Evde_Mi [label=" Evet "];
+    Tehdit_Algilandi_Mi -> Bekle [label=" Hayır (Güvende) "];
+    
+    Ev_Sahibi_Evde_Mi -> Kameralari_Aktif_Et [label=" Hayır (Gerçek Tehdit) "];
+    Ev_Sahibi_Evde_Mi -> Bekle [label=" Evet (Yanlış Alarm) "];
+    
+    Kameralari_Aktif_Et -> Alarm_Seviyesi_Belirle;
+    Alarm_Seviyesi_Belirle -> Alarmi_Cal;
+    Alarmi_Cal -> Kullanici_Komutu_Kontrol;
+    
+    Kullanici_Komutu_Kontrol -> Sistemi_Sifirla [label=" Evet "];
+    Kullanici_Komutu_Kontrol -> Bekle [label=" Hayır (Alarm Sürsün) "];
+    
+    Sistemi_Sifirla -> Bekle;
+    Bekle -> Sistem_Aktif_Mi [label=" Döngüyü Tekrarla "];
+}
